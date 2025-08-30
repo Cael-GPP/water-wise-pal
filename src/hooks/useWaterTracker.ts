@@ -28,7 +28,7 @@ const DEFAULT_USER_DATA: UserData = {
   weight: 70,
   height: 170,
   age: 25,
-  goal: 2.5
+  goal: 2.45 // Will be calculated automatically based on weight
 };
 
 const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
@@ -158,11 +158,22 @@ export function useWaterTracker() {
     return getTodayEntries().reduce((total, entry) => total + entry.amount, 0);
   };
 
+  // Calculate water goal based on weight (35ml per kg)
+  const calculateWaterGoal = (weight: number) => {
+    return parseFloat((weight * 0.035).toFixed(2));
+  };
+
   const updateUserData = (newData: UserData) => {
-    setUserData(newData);
+    // Auto-calculate goal based on weight if weight changed
+    const updatedData = {
+      ...newData,
+      goal: calculateWaterGoal(newData.weight)
+    };
+    
+    setUserData(updatedData);
     toast({
       title: "Perfil atualizado!",
-      description: "Seus dados foram salvos com sucesso.",
+      description: `Meta diária calculada: ${updatedData.goal}L baseada no seu peso.`,
     });
   };
 
